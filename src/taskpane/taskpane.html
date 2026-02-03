@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https:;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://appsforoffice.microsoft.com https: http://localhost:3000;
+    style-src 'self' 'unsafe-inline' https:;
+    img-src 'self' data: https:;
+    font-src 'self' https: data:;
+    connect-src 
+        'self' 
+        https: 
+        http://localhost:3000 
+        ws://localhost:3000 
+        http://127.0.0.1:8000
+        http://localhost:8000;
+    frame-src 'self' https:;
+    ">
+
+
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Outlook Phishing Analyzer</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+    <!-- Fluent UI -->
+    <link rel="stylesheet" href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css"/>
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-welcome ms-Fabric">
+
+<header class="ms-welcome__header">
+    <div class="shield-logo">
+        <img src="../../assets/icon-80.png" alt="Security Shield" />
+      </div>
+      
+    <h2>Phishing Analyzer</h2>
+</header>
+
+<section id="sideload-msg" class="ms-welcome__main">
+    <h2 class="ms-font-xl">
+        Please <a target="_blank" href="https://learn.microsoft.com/office/dev/add-ins/testing/test-debug-office-add-ins#sideload-an-office-add-in-for-testing">sideload</a>
+        your add-in to see app body.
+    </h2>
+</section>
+
+<main id="app-body" class="ms-welcome__main" style="display: none;">
+
+    <!-- 🔥 NEW: AUTO-SCAN STATUS CARD -->
+    <div class="status-card">
+        <div class="status-header">
+            <h3>🛡️ Auto-Scan Protection</h3>
+            <div class="status-badge" id="autoScanBadge">
+                <span class="status-dot"></span>
+                <span id="autoScanStatus">Checking...</span>
+            </div>
+        </div>
+        <p class="status-description">
+            Automatically scanning all incoming emails for phishing threats.
+        </p>
+        <button id="manageAutoScan" class="btn-secondary">
+            ⚙️ Manage Auto-Scan Settings
+        </button>
+    </div>
+
+    <!-- APP DESCRIPTION (BEFORE ANALYSIS) -->
+    <div id="appDescription">
+        <h4>Manual Email Check</h4>
+        <p>
+            Click the button below to analyze the currently open email for phishing threats.
+        </p>
+        <ul class="feature-list">
+            <li>✓ Scans suspicious URLs and domains</li>
+            <li>✓ Detects urgency-based social engineering</li>
+            <li>✓ Identifies sender authentication issues</li>
+            <li>✓ Provides actionable security insights</li>
+        </ul>
+    </div>
+
+    <!-- ANALYZE BUTTON -->
+    <button id="run" class="analyze-button">
+        🔍 Analyze Current Email
+    </button>
+
+    <!-- 🔥 NEW: SCAN UNREAD EMAILS BUTTON -->
+    <button id="scanUnread" class="scan-unread-button">
+        📧 Scan All Unread Emails
+    </button>
+
+    <!-- 🔥 NEW: SCAN RESULTS SUMMARY (For bulk scan) -->
+    <div id="scanSummary" style="display:none;" class="scan-summary">
+        <h4>Scan Results</h4>
+        <div class="summary-grid">
+            <div class="summary-item safe">
+                <div class="summary-count" id="safeCount">0</div>
+                <div class="summary-label">Safe</div>
+            </div>
+            <div class="summary-item suspicious">
+                <div class="summary-count" id="suspiciousCount">0</div>
+                <div class="summary-label">Suspicious</div>
+            </div>
+            <div class="summary-item phishing">
+                <div class="summary-count" id="phishingCount">0</div>
+                <div class="summary-label">Phishing</div>
+            </div>
+        </div>
+        <div id="phishingList"></div>
+    </div>
+
+    <!-- RESULTS SECTION (HIDDEN UNTIL ANALYSIS) -->
+    <div id="resultsSection" style="display:none;">
+
+        <hr />
+
+        <!-- STATUS BOX -->
+        <div id="statusBox">
+            <h3 id="statusText"></h3>
+            <p id="confidenceText"></p>
+        </div>
+
+        <!-- SECURITY INSIGHT -->
+        <div id="analysisMessageBox">
+            <b>Security Insight</b>
+            <p id="analysisMessage"></p>
+        </div>
+
+        <h4>Analysis Details</h4>
+        <ul>
+            <li>Links Found: <b><span id="links"></span></b></li>
+            <li>Suspicious Words: <b><span id="suspiciousWords"></span></b></li>
+            <li>Risk Level: <b><span id="riskLevel"></span></b></li>
+        </ul>
+        <!-- REPORT BUTTON -->
+        <button id="reportButton" class="analyze-button" style="margin-top: 12px;">
+        🚨 Report to ADMIN
+        </button>
+
+
+    </div>
+
+</main>
+
+</body>
+</html>
