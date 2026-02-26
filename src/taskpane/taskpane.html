@@ -14,7 +14,9 @@
         http://localhost:3000 
         ws://localhost:3000 
         http://127.0.0.1:8000
-        http://localhost:8000;
+        http://localhost:8000
+        https://phishbuster-backend-z1a7.onrender.com
+        https://*.environment.api.powerplatform.com;
     frame-src 'self' https:;
     ">
 
@@ -88,9 +90,9 @@
     </button>
 
     <!-- 🔥 NEW: SCAN UNREAD EMAILS BUTTON -->
-    <button id="scanUnread" class="scan-unread-button">
+    <!-- <button id="scanUnread" class="scan-unread-button">
         📧 Scan All Unread Emails
-    </button>
+    </button> -->
 
     <!-- 🔥 NEW: SCAN RESULTS SUMMARY (For bulk scan) -->
     <div id="scanSummary" style="display:none;" class="scan-summary">
@@ -122,6 +124,13 @@
             <h3 id="statusText"></h3>
             <p id="confidenceText"></p>
         </div>
+ 
+
+        <!-- INTERNAL / EXTERNAL BADGE -->
+        <!-- <div id="originBadge" style="margin-top: 10px; display: none;">
+        <span id="originLabel" class="origin-badge">INTERNAL</span>
+        </div> -->
+
 
         <!-- SECURITY INSIGHT -->
         <div id="analysisMessageBox">

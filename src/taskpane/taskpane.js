@@ -5,9 +5,13 @@
 // const BACKEND_URL = "https://YOUR-APP-NAME.onrender.com"; 
 // Example: "https://phishing-detector-abc123.onrender.com"
 // Get this URL after Render deployment (Step 5 in deployment guide)
-const BACKEND_URL = "http://127.0.0.1:8000";
+window.autoReportedMessageIds = new Set();
 
-const POWER_AUTOMATE_URL = "https://make.powerautomate.com"; // User's flow URL will go here
+const BACKEND_URL = "https://phishbuster-backend-z1a7.onrender.com";
+const POWER_AUTOMATE_URL = "https://make.powerautomate.com/";
+
+
+const POWER_AUTOMATE_REPORT_URL = "https://defaultbe72d8b946d24e37b7f93ee54da231.6f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/32b98a3c81104e0790786be7c33e3cee/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIxn0XC1QUI6g7_Zre5S0pqyRyHFv-MfAb0XFLIH3sQ";// User's flow URL will go here
 
 Office.onReady(() => {
   document.getElementById("sideload-msg").style.display = "none";
@@ -17,13 +21,14 @@ Office.onReady(() => {
   document.getElementById("resultsSection").style.display = "none";
   document.getElementById("scanSummary").style.display = "none";
   document.getElementById("appDescription").style.display = "block";
+  document.getElementById("reportButton").style.display = "none";
 
   // 🔥 NEW: Check Auto-Scan Status on Load
   checkAutoScanStatus();
 
   // Button Event Listeners
   document.getElementById("run").onclick = analyzeCurrentEmail;
-  document.getElementById("scanUnread").onclick = scanUnreadEmails;
+  // document.getElementById("scanUnread").onclick = scanUnreadEmails;
   document.getElementById("manageAutoScan").onclick = openAutoScanSettings;
 });
 
@@ -51,18 +56,13 @@ function checkAutoScanStatus() {
 // ==========================================================
 
 function openAutoScanSettings() {
-  // Opens Power Automate where user can enable/disable the flow
-  const message = 
-    "You'll be redirected to Power Automate where you can:\n\n" +
-    "✓ Enable/Disable automatic scanning\n" +
-    "✓ View flow run history\n" +
-    "✓ Customize automation settings\n\n" +
-    "Open Power Automate?";
-  
-  if (confirm(message)) {
+  try {
     window.open(POWER_AUTOMATE_URL, "_blank");
+  } catch (e) {
+    console.error("Failed to open Power Automate:", e);
   }
 }
+
 
 // ==========================================================
 // 🔥 NEW: SCAN ALL UNREAD EMAILS
@@ -120,7 +120,8 @@ async function scanUnreadEmails() {
     
   } catch (err) {
     console.error("Error in scanUnreadEmails:", err);
-    alert("Error scanning emails. Please try again.");
+    console.error("Failed to report to admin via Power Automate.");
+
   }
 }
 
@@ -248,21 +249,60 @@ function analyzeCurrentEmail() {
         }
 
         const data = await response.json();
+        // ================= INTERNAL / EXTERNAL BADGE =================
+//         const originBadge = document.getElementById("originBadge");
+//         const originLabel = document.getElementById("originLabel");
+
+//         if (typeof data.isInternal !== "undefined") {
+//           originBadge.style.display = "block";
+
+//           if (data.isInternal) {
+//             originLabel.innerText = "INTERNAL";
+//             originLabel.className = "origin-badge origin-internal";
+//           } else {
+//             originLabel.innerText = "EXTERNAL";
+//             originLabel.className = "origin-badge origin-external";
+//           }
+//         } else {
+//           originBadge.style.display = "none";
+// }
+
+                // Set base analysis message first
+        document.getElementById("analysisMessage").innerText =
+          data.analysisMessage || data.aiExplanation || "No detailed analysis available.";
+
+        // STORE LAST ANALYSIS FOR REPORTING
         // STORE LAST ANALYSIS FOR REPORTING
         window.lastAnalysis = {
           category: data.category,
           sender: sender,
           subject: subject,
           reason: data.reason,
-          messageId: item.itemId || ""
+          messageId: item.itemId || "",
+          confidence: data.confidence || null
         };
+        
+        // Store current email info for manual reporting
+        window.currentMessageId = item.itemId || "";
+        window.currentSender = sender || "";
 
+        window.currentUserEmail = Office.context.mailbox.userProfile.emailAddress || "";
+        window.currentSubject = subject || "";
 
         // ================= FIXED LOGIC =================
 
         // ================= CATEGORY-BASED LOGIC =================
 
         const category = data.category; // SAFE | SUSPICIOUS | PHISHING
+        const reportBtn = document.getElementById("reportButton");
+
+        // Show button only for PHISHING or SUSPICIOUS
+        if (category === "PHISHING" || category === "SUSPICIOUS") {
+          reportBtn.style.display = "block";
+        } else {
+          reportBtn.style.display = "none";
+        }
+
         const confidence = data.confidence ?? null;
         
 
@@ -278,6 +318,13 @@ function analyzeCurrentEmail() {
           statusText.style.color = "#d93025";
         
           confidenceText.innerText = "Confidence: " + confidence + "%";
+          const msgId = item.itemId || "";
+          if (!window.autoReportedMessageIds.has(msgId)) {
+            window.autoReportedMessageIds.add(msgId);
+            
+            document.getElementById("analysisMessage").innerText += 
+            "\n\n🚨 This phishing email was automatically reported to Admin.";
+          }
         
         } else if (category === "SUSPICIOUS") {
           statusBox.style.backgroundColor = "#fff3cd";
@@ -309,15 +356,13 @@ function analyzeCurrentEmail() {
 
         document.getElementById("riskLevel").innerText = category;
 
-        // SECURITY INSIGHT MESSAGE
-        document.getElementById("analysisMessage").innerText =
-        data.aiExplanation || data.analysisMessage || "No detailed analysis available.";
+
       
 
       } catch (apiErr) {
-        console.error(apiErr);
+        console.error("Frontend error after API call:", apiErr);
         document.getElementById("statusText").innerText =
-          "Backend not reachable. Is API running?";
+          "Error while processing response. Check console.";
       }
     });
 
@@ -328,14 +373,15 @@ function analyzeCurrentEmail() {
   }
 }
 document.getElementById("reportButton").onclick = async function () {
+  console.log("🚀 Report button clicked, sending to Power Automate...");
   if (!window.lastAnalysis) {
-    alert("No analysis available to report.");
+    showReportSuccess("No analysis available to report.");
     return;
   }
 
   // 🚨 Only allow reporting for PHISHING / SUSPICIOUS
   if (!["PHISHING", "SUSPICIOUS"].includes(window.lastAnalysis.category)) {
-    alert("Only suspicious or phishing emails can be reported.");
+    showReportSuccess("Only suspicious or phishing emails can be reported.");
     return;
   }
 
@@ -349,25 +395,32 @@ document.getElementById("reportButton").onclick = async function () {
     sender: window.currentSender || "",
     reportedBy: window.currentUserEmail || ""
   };
+ 
+
 
   try {
-    const response = await fetch(`${BACKEND_URL}/report-to-admin`, {
+    const response = await fetch(POWER_AUTOMATE_REPORT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(reportPayload)
+      body: JSON.stringify({
+        category: reportPayload.category,
+        confidence: reportPayload.confidence,
+        sender: reportPayload.sender,
+        subject: window.currentSubject || "",
+        messageId: reportPayload.messageId
+      })
     });
 
-    const data = await response.json();
-
-    if (data.status === "reported") {
+    if (response.ok) {
       showReportSuccess("Reported to IT Admin for review.");
     } else {
-      alert(data.reason || "Report was not accepted.");
+      alertconsole.error("Failed to report to admin via Power Automate.");
     }
+    
 
   } catch (err) {
     console.error(err);
-    alert("Failed to report email.");
+    showReportSuccess("Failed to report email.");
   }
 };
 
@@ -376,3 +429,6 @@ function showReportSuccess(message) {
   msgBox.innerText = "✅ " + (message || "Reported successfully");
   msgBox.style.color = "green";
 }
+
+
+

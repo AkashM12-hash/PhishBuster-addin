@@ -96,7 +96,24 @@ ul {
     height: 48px;
     object-fit: contain;
 }
+.origin-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-weight: bold;
+    color: white;
+    display: inline-block;
+    font-size: 12px;
+  }
+  
+  .origin-internal {
+    background-color: #28a745; /* green */
+  }
+  
+  .origin-external {
+    background-color: #ff9800; /* orange */
+  }
 
+   
 /* ==========================================================
    🔥 NEW: AUTO-SCAN STATUS CARD
    ========================================================== */
