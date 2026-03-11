@@ -16,7 +16,7 @@
         http://127.0.0.1:8000
         http://localhost:8000
         https://phishbuster-backend-z1a7.onrender.com
-        https://*.environment.api.powerplatform.com;
+
     frame-src 'self' https:;
     ">
 
@@ -124,6 +124,17 @@
             <h3 id="statusText"></h3>
             <p id="confidenceText"></p>
         </div>
+        <div id="riskMeterContainer" style="margin-top:15px;">
+            <h4>Email Risk Meter</h4>
+          
+            <div style="background:#e0e0e0;height:12px;border-radius:8px;">
+              <div id="riskMeterBar"
+                   style="height:12px;width:0%;border-radius:8px;background:#2F2FA2;">
+              </div>
+            </div>
+          
+            <div id="riskMeterLabel" style="margin-top:5px;font-size:12px;"></div>
+          </div>
  
 
         <!-- INTERNAL / EXTERNAL BADGE -->

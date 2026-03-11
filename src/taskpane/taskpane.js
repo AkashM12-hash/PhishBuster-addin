@@ -7,11 +7,14 @@
 // Get this URL after Render deployment (Step 5 in deployment guide)
 window.autoReportedMessageIds = new Set();
 
-const BACKEND_URL = "https://phishbuster-backend-z1a7.onrender.com";
-const POWER_AUTOMATE_URL = "https://make.powerautomate.com/";
+const BACKEND_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000"
+    : "https://phishbuster-backend-z1a7.onrender.com";
 
 
-const POWER_AUTOMATE_REPORT_URL = "https://defaultbe72d8b946d24e37b7f93ee54da231.6f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/32b98a3c81104e0790786be7c33e3cee/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIxn0XC1QUI6g7_Zre5S0pqyRyHFv-MfAb0XFLIH3sQ";// User's flow URL will go here
+
+
 
 Office.onReady(() => {
   document.getElementById("sideload-msg").style.display = "none";
@@ -56,11 +59,7 @@ function checkAutoScanStatus() {
 // ==========================================================
 
 function openAutoScanSettings() {
-  try {
-    window.open(POWER_AUTOMATE_URL, "_blank");
-  } catch (e) {
-    console.error("Failed to open Power Automate:", e);
-  }
+  alert("Auto-scan settings are managed by the IT administrator.");
 }
 
 
@@ -120,7 +119,7 @@ async function scanUnreadEmails() {
     
   } catch (err) {
     console.error("Error in scanUnreadEmails:", err);
-    console.error("Failed to report to admin via Power Automate.");
+    console.error("Auto scan failed.");
 
   }
 }
@@ -236,9 +235,12 @@ function analyzeCurrentEmail() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            senderName: item.from?.displayName || "",
+            senderEmail: sender,
+            userEmail: Office.context.mailbox.userProfile.emailAddress || "",
             subject: subject,
             body: body,
-            sender: sender
+            messageId: item.itemId || ""
           })
         });
 
@@ -249,6 +251,23 @@ function analyzeCurrentEmail() {
         }
 
         const data = await response.json();
+        const riskScore = data.riskScore || 0;
+        const riskLevel = data.riskLevel || "LOW";
+
+        const meterBar = document.getElementById("riskMeterBar");
+        const meterLabel = document.getElementById("riskMeterLabel");
+
+        meterBar.style.width = riskScore + "%";
+
+        if (riskLevel === "HIGH") {
+          meterBar.style.background = "#E53935";
+        } else if (riskLevel === "MEDIUM") {
+          meterBar.style.background = "#FFC107";
+        } else {
+          meterBar.style.background = "#1DB954";
+        }
+
+        meterLabel.innerText = riskScore + "% — " + riskLevel + " RISK";
         // ================= INTERNAL / EXTERNAL BADGE =================
 //         const originBadge = document.getElementById("originBadge");
 //         const originLabel = document.getElementById("originLabel");
@@ -373,7 +392,7 @@ function analyzeCurrentEmail() {
   }
 }
 document.getElementById("reportButton").onclick = async function () {
-  console.log("🚀 Report button clicked, sending to Power Automate...");
+  console.log("🚀 Report button clicked, sending to backend...");
   if (!window.lastAnalysis) {
     showReportSuccess("No analysis available to report.");
     return;
@@ -399,22 +418,23 @@ document.getElementById("reportButton").onclick = async function () {
 
 
   try {
-    const response = await fetch(POWER_AUTOMATE_REPORT_URL, {
+    const response = await fetch(`${BACKEND_URL}/report-to-admin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        messageId: reportPayload.messageId,
         category: reportPayload.category,
         confidence: reportPayload.confidence,
+        ruleHits: reportPayload.ruleHits,
         sender: reportPayload.sender,
-        subject: window.currentSubject || "",
-        messageId: reportPayload.messageId
+        reportedBy: reportPayload.reportedBy
       })
     });
 
     if (response.ok) {
       showReportSuccess("Reported to IT Admin for review.");
     } else {
-      alertconsole.error("Failed to report to admin via Power Automate.");
+      console.error("Failed to report to admin.");
     }
     
 
