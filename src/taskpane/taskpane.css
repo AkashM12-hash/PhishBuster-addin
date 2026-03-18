@@ -1,317 +1,142 @@
-/* ==========================================================
-   GLOBAL
-========================================================== */
-
-html,
 body {
-    width: 100%;
-    height: 100%;
+    font-family: "Segoe UI", sans-serif;
     margin: 0;
-    padding: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: #f3f6fb;
+    background: #f4f6fb;
 }
 
-ul {
-    margin: 0;
-    padding: 0;
-}
-
-/* ==========================================================
-   HEADER (Security Product Style)
-========================================================== */
-
-.ms-welcome__header {
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
+/* HEADER */
+.header {
     background: linear-gradient(135deg,#2F2FA2,#FF4A2F);
+    padding: 16px;
     color: white;
-
-    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 
-.ms-welcome__header h2 {
-    margin-top: 12px;
+.header-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 36px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    margin: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: flex;
+    gap: 10px;
+}
+
+.metric {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.metric h3 {
+    margin: 0;
     font-size: 22px;
+}
+
+.metric.phishing {
+    background: #fdecea;
+}
+
+.metric.suspicious {
+    background: #fff3cd;
+}
+
+/* BADGE */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: 600;
 }
 
-/* ==========================================================
-   LOGO
-========================================================== */
-
-.shield-logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
-
-    background: linear-gradient(135deg,#1a1a40,#2F2FA2);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-}
-
-.shield-logo img {
-    width: 48px;
-}
-
-/* ==========================================================
-   MAIN AREA
-========================================================== */
-
-.ms-welcome__main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 22px;
-}
-
-/* ==========================================================
-   SECURITY CARD
-========================================================== */
-
-.status-card {
-
-    width: 100%;
-    max-width: 400px;
-
-    background: white;
-
-    border-radius: 14px;
-
-    padding: 20px;
-
-    margin-bottom: 18px;
-
-    box-shadow:
-        0 4px 14px rgba(0,0,0,0.08);
-
-    border-left: 6px solid #2F2FA2;
-}
-
-.status-header {
+/* SECTION HEADER */
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.status-header h3 {
-    margin: 0;
-    color: #2F2FA2;
+/* RISK */
+.risk-bar {
+    height: 8px;
+    background: #ddd;
+    border-radius: 6px;
 }
 
-/* ==========================================================
-   STATUS BADGE
-========================================================== */
-
-.status-badge {
-
-    display: flex;
-    align-items: center;
-
-    gap: 6px;
-
-    padding: 6px 12px;
-
-    border-radius: 20px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    background: #f1f5ff;
+#riskFill {
+    height: 8px;
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.4s ease;
 }
 
-.status-dot {
-
-    width: 10px;
-    height: 10px;
-
-    border-radius: 50%;
-
-    background: #ccc;
-}
-
-.status-badge.status-active .status-dot {
-    background: #1DB954;
-}
-
-/* ==========================================================
-   DESCRIPTION BOX
-========================================================== */
-
-#appDescription {
-
-    background: white;
-
-    padding: 18px;
-
-    border-radius: 12px;
-
-    margin-bottom: 18px;
-
-    width: 100%;
-
-    max-width: 400px;
-
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-
-    border-left: 6px solid #2F2FA2;
-}
-
-#appDescription h4 {
-
-    margin-top: 0;
-
-    color: #2F2FA2;
-
-}
-
-.feature-list {
-
-    margin-top: 10px;
-
-    padding-left: 18px;
-
-}
-
-.feature-list li {
-
-    margin: 6px 0;
-
+#riskLabel {
+    margin-top: 5px;
+    font-size: 12px;
     color: #555;
-
 }
 
-/* ==========================================================
-   ANALYZE BUTTON
-========================================================== */
-
-.analyze-button {
-
-    background: linear-gradient(135deg,#2F2FA2,#FF4A2F);
-
-    color: white;
-
-    border: none;
-
-    border-radius: 10px;
-
-    padding: 14px 30px;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    margin-top: 18px;
-
-    width: 100%;
-
-    max-width: 280px;
-
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-
-    transition: all .25s ease;
+/* TEXT */
+.subtle {
+    font-size: 12px;
+    color: #666;
 }
 
-.analyze-button:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-}
-
-/* ==========================================================
-   STATUS BOX
-========================================================== */
-
-#statusBox {
-
-    margin-top: 18px;
-
-    padding: 18px;
-
-    border-radius: 12px;
-
-    background: white;
-
-    text-align: center;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-#statusBox h3 {
-    margin: 0 0 8px 0;
-}
-
-/* ==========================================================
-   SECURITY INSIGHT
-========================================================== */
-
-#analysisMessageBox {
-
-    margin-top: 14px;
-
-    padding: 16px;
-
-    background: #f1f5ff;
-
-    border-left: 5px solid #2F2FA2;
-
-    border-radius: 10px;
-}
-
-#analysisMessageBox b {
-
-    color: #2F2FA2;
-
-}
-
-/* ==========================================================
-   DETAILS LIST
-========================================================== */
-
-#resultsSection ul {
-
-    list-style: none;
-
-    padding: 0;
-}
-
-#resultsSection ul li {
-
-    padding: 10px 14px;
-
-    margin: 6px 0;
-
-    background: #f8f9fc;
-
-    border-radius: 8px;
-
+/* FLOW */
+.flow-card {
     border-left: 4px solid #2F2FA2;
+    background: #f1f5ff;
 }
 
-/* ==========================================================
-   RISK METER
-========================================================== */
-
-#riskMeterContainer {
-    margin-top: 18px;
+/* DETAILS */
+.detail-item {
+    margin-top: 10px;
 }
 
-#riskMeterBar {
+.detail-item span {
+    font-size: 12px;
+    color: #666;
+}
 
-    height: 12px;
-
+/* BUTTON */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    border: none;
     border-radius: 8px;
+    background: #2F2FA2;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-    transition: width .5s ease;
+/* ANIMATION */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
