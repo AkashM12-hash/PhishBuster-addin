@@ -153,3 +153,33 @@ body {
     margin-top: 10px;
     cursor: pointer;
 }
+.links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.link-chip {
+    display: block;
+    max-width: 100%;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: #f1f3f4;
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 12px;
+
+    /* 🔥 IMPORTANT */
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+
+.link-chip:hover {
+    background: #e8f0fe;
+}
+
+.no-data {
+    color: #888;
+    font-size: 12px;
+}

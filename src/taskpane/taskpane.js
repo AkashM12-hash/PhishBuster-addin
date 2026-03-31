@@ -79,11 +79,33 @@ function updateUI(data) {
         data.analysisMessage || "";
 
     // ===== DETAILS =====
-    document.getElementById("links").innerText =
-        data.details?.links?.join(", ") || "None";
+    // ===== DETAILS =====
 
+    // 🔥 FIXED LINKS UI
+    const linksContainer = document.getElementById("links");
+    linksContainer.innerHTML = "";
+    
+    const links = data.details?.links || [];
+    
+    if (links.length === 0) {
+        linksContainer.innerHTML = "<span class='no-data'>None</span>";
+    } else {
+        links.forEach(link => {
+            const a = document.createElement("a");
+            a.href = link;
+            a.innerText = link;
+            a.target = "_blank";
+            a.className = "link-chip";
+    
+            linksContainer.appendChild(a);
+        });
+    }
+    
+    // Keep this SAME (no change)
     document.getElementById("words").innerText =
         data.details?.suspiciousWords?.join(", ") || "None";
+
+
 
     // ===== FLOW =====
     if (category === "PHISHING") {
