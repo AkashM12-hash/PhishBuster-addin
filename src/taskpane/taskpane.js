@@ -6,11 +6,11 @@ const BACKEND_URL =
     : "https://phishbuster-backend-z1a7.onrender.com";
 
 Office.onReady(() => {
-    analyzeEmail();
+    document.getElementById("analyzeBtn").onclick = analyzeEmail;
 });
 
 async function analyzeEmail() {
-
+    document.getElementById("statusBadge").innerText = "Analyzing...";
     const item = Office.context.mailbox.item;
 
     item.body.getAsync(Office.CoercionType.Text, async function (res) {
